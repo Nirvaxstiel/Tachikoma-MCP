@@ -7,7 +7,7 @@ from src.tachikoma_mcp.tools.execute_with_verification import execute_with_verif
 from src.tachikoma_mcp.tools.learn_skill_outcome import learn_skill_outcome
 from src.tachikoma_mcp.tools.query_graph_memory import query_graph_memory
 from src.tachikoma_mcp.tools.enhanced_rlm_process import enhanced_rlm_process
-from mcp.types import ReadResourceRequest, ReadResourceRequestParams
+from mcp.types import ReadResourceRequest
 
 
 class TestMCPServer:
@@ -326,7 +326,7 @@ class TestMCPServer:
         # Test topology patterns resource
         request = ReadResourceRequest(
             method="resources/read",
-            params=ReadResourceRequestParams(uri="tachikoma://topology-patterns"),
+            params=ReadResourceRequest(uri="tachikoma://topology-patterns"),
         )
 
         result = await server.handle_read_resource(request)
@@ -340,7 +340,7 @@ class TestMCPServer:
         # Test skill outcomes resource
         request = ReadResourceRequest(
             method="resources/read",
-            params=ReadResourceRequestParams(uri="tachikoma://skill-outcomes"),
+            params=ReadResourceRequest(uri="tachikoma://skill-outcomes"),
         )
 
         result = await server.handle_read_resource(request)
@@ -352,7 +352,7 @@ class TestMCPServer:
         # Test graph memory resource
         request = ReadResourceRequest(
             method="resources/read",
-            params=ReadResourceRequestParams(uri="tachikoma://graph-memory"),
+            params=ReadResourceRequest(uri="tachikoma://graph-memory"),
         )
 
         result = await server.handle_read_resource(request)
