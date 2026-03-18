@@ -1,7 +1,7 @@
 """Analyze task and recommend optimal orchestration topology tool."""
 
-from typing import Any, Dict
 import json
+from typing import Any, Dict
 
 from ..models import TopologyPattern
 

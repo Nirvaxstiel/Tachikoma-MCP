@@ -13,37 +13,30 @@ Implements key findings from recent research:
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List, Optional
-from datetime import datetime
+from typing import Dict, List
 
 from mcp.server.lowlevel import Server
-from mcp.server.models import InitializationOptions
 from mcp.types import (
-    Tool,
-    TextContent,
-    Resource,
-    LoggingLevel,
+    CallToolRequest,
     ListResourcesRequest,
     ListResourcesResult,
     ListToolsRequest,
     ListToolsResult,
-    CallToolRequest,
-    CallToolResult,
-    ReadResourceRequest,
-    ReadResourceResult,
-    TextResourceContents,
+    Resource,
+    TextContent,
+    Tool,
 )
 from pydantic.networks import AnyUrl
 
 # Import models
-from .models import TopologyPattern, SkillOutcome, GraphNode, GraphEdge
+from .models import GraphEdge, GraphNode, SkillOutcome, TopologyPattern
 
 # Import tools
 from .tools.analyze_topology import analyze_topology
+from .tools.enhanced_rlm_process import enhanced_rlm_process
 from .tools.execute_with_verification import execute_with_verification
 from .tools.learn_skill_outcome import learn_skill_outcome
 from .tools.query_graph_memory import query_graph_memory
-from .tools.enhanced_rlm_process import enhanced_rlm_process
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -130,17 +123,36 @@ async def handle_read_resource(uri: AnyUrl) -> str:
             {
                 "resource": "Skill Outcomes",
                 "description": "Historical skill execution outcomes for learning",
-                "outcomes": [o.model_dump() for o in skill_outcomes[-50:]],
+                "outcomes": [
+                    {
+                        **o.model_dump(),
+                        "timestamp": o.timestamp.isoformat()
+                        if hasattr(o, "timestamp")
+                        else None,
+                    }
+                    for o in skill_outcomes[-50:]
+                ],
             },
             indent=2,
         )
         return content
     elif uri_str == "tachikoma://graph-memory":
+        # Ensure timestamps are serialized as strings
+        nodes_data = []
+        for n in list(graph_nodes.values())[-50:]:
+            node_dict = n.model_dump()
+            # Handle timestamp in properties if present
+            if "timestamp" in node_dict.get("properties", {}):
+                node_dict["properties"]["timestamp"] = str(
+                    node_dict["properties"]["timestamp"]
+                )
+            nodes_data.append(node_dict)
+
         content = json.dumps(
             {
                 "resource": "Graph Memory",
                 "description": "Current state of graph-based memory system",
-                "nodes": [n.model_dump() for n in list(graph_nodes.values())[-50:]],
+                "nodes": nodes_data,
                 "edges": [e.model_dump() for e in graph_edges[-50:]],
             },
             indent=2,
@@ -350,10 +362,29 @@ class TachikomaMCPServer:
         self.graph_nodes = graph_nodes
         self.graph_edges = graph_edges
 
+    async def handle_list_resources(self, request):
+        """List available resources"""
+        return await handle_list_resources(request)
+
+    async def handle_read_resource(self, uri: str):
+        """Read a specific resource by URI"""
+        from pydantic.networks import AnyUrl
+
+        return await handle_read_resource(AnyUrl(uri))
+
+    async def handle_list_tools(self, request):
+        """List available tools"""
+        return await handle_list_tools(request)
+
+    async def handle_call_tool(self, request):
+        """Handle tool calls"""
+        return await handle_call_tool(request)
+
 
 def main(argv=None):
     """Main entry point."""
     import argparse
+
     from . import __version__
 
     parser = argparse.ArgumentParser(

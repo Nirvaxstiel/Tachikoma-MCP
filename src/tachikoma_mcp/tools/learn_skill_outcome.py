@@ -1,10 +1,10 @@
 """Record skill execution outcome for future learning tool."""
 
-from typing import Any, Dict
 import json
 from datetime import datetime
+from typing import Any, Dict
 
-from ..models import SkillOutcome, GraphNode
+from ..models import GraphNode, SkillOutcome
 
 
 async def learn_skill_outcome(

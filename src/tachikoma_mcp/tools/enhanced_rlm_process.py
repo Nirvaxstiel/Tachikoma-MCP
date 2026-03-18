@@ -1,7 +1,7 @@
 """Process large context using enhanced RLM with hierarchical indexing tool."""
 
-from typing import Any, Dict
 import json
+from typing import Any, Dict
 
 
 async def enhanced_rlm_process(arguments: Dict[str, Any]) -> str:

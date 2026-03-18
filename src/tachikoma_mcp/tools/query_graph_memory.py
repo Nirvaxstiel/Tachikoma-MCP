@@ -1,8 +1,7 @@
 """Query the graph-based memory system tool."""
 
-from typing import Any, Dict
 import json
-from ..models import GraphNode
+from typing import Any, Dict
 
 
 async def query_graph_memory(
@@ -27,7 +26,7 @@ async def query_graph_memory(
             if match_score > 0:
                 matches.append(
                     {
-                        "node": node.dict(),
+                        "node": node.model_dump(),
                         "score": match_score / len(properties_filter)
                         if properties_filter
                         else 1.0,
@@ -63,7 +62,7 @@ async def query_graph_memory(
                 visited.add(node_id)
                 node = graph_nodes[node_id]
                 traversal_path.append(
-                    {"node_id": node_id, "node": node.dict(), "depth": depth}
+                    {"node_id": node_id, "node": node.model_dump(), "depth": depth}
                 )
 
                 # Add neighbors (simplified - in real implementation would use edges)
@@ -88,7 +87,9 @@ async def query_graph_memory(
             "total_nodes": len(graph_nodes),
             "total_edges": len(graph_edges),
             "node_types": {},
-            "recent_nodes": [node.dict() for node in list(graph_nodes.values())[-5:]],
+            "recent_nodes": [
+                node.model_dump() for node in list(graph_nodes.values())[-5:]
+            ],
         }
 
         # Count node types

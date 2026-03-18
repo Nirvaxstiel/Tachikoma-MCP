@@ -13,37 +13,37 @@ Implements key findings from recent research:
 import asyncio
 import json
 import logging
-from typing import Any, Dict, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
 
 from mcp.server.lowlevel import Server
 from mcp.server.models import InitializationOptions
 from mcp.types import (
-    Tool,
-    TextContent,
-    Resource,
-    LoggingLevel,
+    CallToolRequest,
+    CallToolResult,
     ListResourcesRequest,
     ListResourcesResult,
     ListToolsRequest,
     ListToolsResult,
-    CallToolRequest,
-    CallToolResult,
+    LoggingLevel,
     ReadResourceRequest,
     ReadResourceResult,
+    Resource,
+    TextContent,
     TextResourceContents,
+    Tool,
 )
 from pydantic.networks import AnyUrl
 
 # Import models
-from .models import TopologyPattern, SkillOutcome, GraphNode, GraphEdge
+from .models import GraphEdge, GraphNode, SkillOutcome, TopologyPattern
 
 # Import tools
 from .tools.analyze_topology import analyze_topology
+from .tools.enhanced_rlm_process import enhanced_rlm_process
 from .tools.execute_with_verification import execute_with_verification
 from .tools.learn_skill_outcome import learn_skill_outcome
 from .tools.query_graph_memory import query_graph_memory
-from .tools.enhanced_rlm_process import enhanced_rlm_process
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -343,6 +343,7 @@ async def run():
 def main(argv=None):
     """Main entry point."""
     import argparse
+
     from . import __version__
 
     parser = argparse.ArgumentParser(

@@ -1,8 +1,7 @@
 """Execute a task with verification loops and grounding tool."""
 
-from typing import Any, Dict
 import json
-from datetime import datetime
+from typing import Any, Dict
 
 
 async def execute_with_verification(arguments: Dict[str, Any]) -> str:
